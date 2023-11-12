@@ -18,7 +18,7 @@ global {
 	bool clean_data <- true parameter: true;
 	
 	//tolerance for reconnecting nodes
-	float tolerance <- 3.0 parameter: true;
+	float tolerance <- 300.0 parameter: true;
 	
 	//if true, split the lines at their intersection
 	bool split_lines <- true parameter: true;
