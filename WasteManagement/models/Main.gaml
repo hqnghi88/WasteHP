@@ -38,7 +38,9 @@ create recyclebin from:csv_file( "../includes/LE-CHAN 2.xlsx - Sheet1.csv",true)
 				address::string(get("address"))
 			]{
 											location <- to_GAMA_CRS({lon,lat}, "4326").location;
-				
+				if (not (location overlaps world.shape)){
+					do die;
+				}
 			}
 		 
 
