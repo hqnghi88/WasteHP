@@ -9,7 +9,7 @@ model clean_road_network
 
 global {
 	//Shapefile of the roads
-	file road_shapefile <- file("../includes/quanlechan.shp"); 	
+	file road_shapefile <- file("../includes/buildingVin.shp"); 	
 	//Shape of the environment
 	geometry shape <- envelope(road_shapefile);
 	
@@ -34,19 +34,19 @@ global {
 	init {
 		
 		//clean data, with the given options
-		list<geometry> clean_lines <- clean_data ? clean_network(road_shapefile.contents,tolerance,split_lines,reduce_to_main_connected_components) : road_shapefile.contents;
+//		list<geometry> clean_lines <- clean_data ? clean_network(road_shapefile.contents,tolerance,split_lines,reduce_to_main_connected_components) : road_shapefile.contents;
 		
 		//create road from the clean lines
-		create road from: clean_lines;
+		create road from: road_shapefile;
 		
-		//build a network from the road agents
-		graph road_network_clean <- as_edge_graph(road);
-		
-		//computed the connected components of the graph (for visualization purpose)
-		connected_components <- list<list<point>>(connected_components_of(road_network_clean));
-		loop times: length(connected_components) {colors << rnd_color(255);} 
+//		//build a network from the road agents
+//		graph road_network_clean <- as_edge_graph(road);
+//		
+//		//computed the connected components of the graph (for visualization purpose)
+//		connected_components <- list<list<point>>(connected_components_of(road_network_clean));
+//		loop times: length(connected_components) {colors << rnd_color(255);} 
 
-		save road to:"../includes/xe 311-611.shp" crs:"3857" format:"shp"; 
+		save road to:"../includes/buildingVin1.shp" crs:"3857" format:"shp"; 
     }
 }
 
