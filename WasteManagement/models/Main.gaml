@@ -16,15 +16,15 @@ global {
 	shape_file quanlechan3110_shape_file <- shape_file("../includes/mapTP_clean.shp");
 	graph road_network;
 	list<recyclebin> tocollect <- [];
-	recyclebin source;
-
+	recyclebin source; 
 	init {
 		create road from: quanlechan3110_shape_file;
 		road_network <- as_edge_graph(road);
+		road_network <- road_network with_shortest_path_algorithm #AStar;
 		create recyclebin from: csv_file("../includes/LE-CHAN 2.xlsx - Sheet1.csv", true) with:
 		[lat::float(get("lat")), lon::float(get("lon")), manual_cart::int(get("note")), address::string(get("addresss"))] {
 			location <- to_GAMA_CRS({lon, lat}, "4326").location;
-			volume <- manual_cart * 600;
+			volume <- manual_cart * 300;
 			if (not (location overlaps world.shape)) {
 				do die;
 			}
@@ -71,6 +71,7 @@ species truck skills: [moving] {
 	int count_comeback_full <- 0;
 	int max_comeback <- 5;
 	int max_total_cycle <- 1000;
+	int total_distance <- 0;
 
 	reflex choseTarget when: (current_target = nil) {
 		if (capacity < max_capacity) {
@@ -86,11 +87,18 @@ species truck skills: [moving] {
 
 	}
 
+	geometry old_path <- nil;
+
 	reflex goto when: current_target != nil {
-		total_cycle <- total_cycle + 1;
 		do goto on: road_network target: current_target speed: mySpeed;
+		if (old_path != current_edge and current_edge != nil) {
+//			write current_edge;
+			total_distance <- total_distance+ current_edge.perimeter;
+			old_path <- current_edge;
+		}
+
 		if (location = current_target.location) {
-			if (current_target = source) {
+			if (current_target = source and capacity > 0) {
 				count_comeback <- count_comeback + 1;
 				if (capacity < max_capacity) {
 					count_comeback_notfull <- count_comeback_notfull + 1;
@@ -119,7 +127,8 @@ species truck skills: [moving] {
 				current_target <- nil;
 			}
 
-		}
+		}else{
+		total_cycle <- total_cycle + 1;}
 
 	}
 
@@ -162,15 +171,30 @@ species recyclebin {
 }
 
 experiment main type: gui {
-	float minimum_cycle_duration <- 0.01;
+	float minimum_cycle_duration <- 0.001;
 	output synchronized: false {
-		layout #split parameters: false navigator: false editors: false consoles: false toolbars: false tray: false tabs: false controls: true;
+		layout horizontal([0::6190, 1::3810]) parameters: false navigator: false editors: false consoles: false toolbars: false tray: false tabs: false controls: true;
+		//		layout parameters: false navigator: false editors: false consoles: false toolbars: false tray: false tabs: false controls: true;
 		display main1 type: 3d axes: false background: #black {
-			camera 'default' location: {7173.9067, 4452.2435, 8396.4835} target: {7173.9067, 4452.0969, 0.0};
+		//			camera 'default' location: {7173.9067, 4452.2435, 8396.4835} target: {7173.9067, 4452.0969, 0.0};
 			image ("../includes/HP.png") position: {0, 0, -0.0001};
 			species road;
 			species truck;
 			species recyclebin position: {0, 0, 0.000001};
+		}
+
+		display main2 type: 3d axes: false background: #black {
+			graphics stats {
+				int y <- 0;
+				loop o over: truck {
+					draw "" + o + " came back " + o.count_comeback + " times, not full " + o.count_comeback_notfull + " times" at: {500, y} color:#white font: font("Arial", 15, #bold);
+					y <- y + 500;
+					draw "Distances:" + int(o.total_distance/1000) + " km"+", duration: "+o.total_cycle+" cycles" at: {1000, y} color:#white  font: font("Arial", 15, #bold);
+					y <- y + 500;
+				}
+
+			}
+
 		}
 
 	}
