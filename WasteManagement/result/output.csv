@@ -1,7 +1,119 @@
-cycle,name;location.x,location.y,location.z,name,index,current_path,destination,current_edge,real_speed,speed,heading,current_target,max_capacity,capacity,total_cycle,mySpeed,count_comeback,count_comeback_notfull,count_comeback_full,max_comeback,max_total_cycle,total_distance,old_path
-1693truck0,9474.818162573501,7244.801692321897,0.0,truck0,0,nil,{9475.15446305196,7243.8599375830245,0.0},nil,0.0,1.0,289.6516387813188,nil,12000,0,1517,41.152430825609876,3,1,2,5,1000,61792,road(715)
-1693truck1,9474.818162573501,7244.801692321897,0.0,truck1,1,nil,{9475.15446305196,7243.8599375830245,0.0},nil,0.0,1.0,289.6516387813188,nil,12000,0,1536,44.02556945118898,3,1,2,5,1000,67345,road(715)
-1693truck2,9474.818162573501,7244.801692321897,0.0,truck2,2,nil,{9475.15446305196,7243.8599375830245,0.0},nil,0.0,1.0,289.6516387813188,nil,12000,0,1531,44.868686547614466,3,1,2,5,1000,67264,road(715)
-1693truck3,9474.818162573501,7244.801692321897,0.0,truck3,3,nil,{9475.15446305196,7243.8599375830245,0.0},nil,0.0,1.0,289.6516387813188,nil,9000,0,1303,49.336445922996724,3,0,3,5,1000,62816,road(715)
-1693truck4,9474.818162573501,7244.801692321897,0.0,truck4,4,nil,{9475.15446305196,7243.8599375830245,0.0},nil,0.0,1.0,289.6516387813188,nil,9000,0,1494,45.23647547277644,3,0,3,5,1000,66063,road(715)
-1693truck5,9474.818162573501,7244.801692321897,0.0,truck5,5,([road(543),road(481),road(194),road(17),road(151),road(150),road(15),road(425),road(426),road(439),road(440),road(246),road(428),road(429),road(227),road(516),road(279),road(11),road(74),road(371),road(372),road(85),road(70),road(77),road(75),road(366),road(663),road(666),road(608),road(607),road(588),road(727),road(728),road(706),road(299),road(651),road(652),road(385),road(99),road(100),road(624),road(714),road(715),road(339)]) as path,{9475.15446305196,7243.8599375830245,0.0},road(715),#nan,1.0,289.6516387813188,nil,4000,0,1636,53.82285804924088,4,1,3,5,1000,86539,road(715)
+cycle,name;location.x,location.y,location.z,index,name,speed,real_speed,current_edge,destination,heading,current_path,current_target,max_capacity,capacity,total_cycle,mySpeed,count_comeback,count_comeback_notfull,count_comeback_full,max_comeback,max_total_cycle,total_distance,reststop,old_path,last_beta
+2390truck0,9474.818151783198,7244.8017036914825,0.0,0,truck0,1.0,0.0,nil,{9475.154452261657,7243.8599489526105,0.0},289.6516387813188,nil,nil,12000,0,2272,45.21212426842173,3,1,2,5,1000,79880.81395969226,Phố  Đình Đông,200
+Phố Đình Đông,211
+Phố Hàng Kênh,217
+Phố Hàng Kênh,221
+Phố Hàng Kênh,222
+Phố Hàng Kênh,223
+Phố Hàng Kênh,224
+Phố Tràng Cát,448
+,1043
+Phố Hàng Kênh,1153
+Phố Chợ Con,1171
+Phố Tràng Cát,1417
+Phố Hồ Sen,1659
+Phố Chùa Hàng,1688
+Phố Chùa Hàng,1689
+Phố Lâm Tường,1704
+Phố Hai Bà Trưng (Cát Dài),2023
+Phố Tràng Cát,2296
+,nil,1
+2390truck1,9474.818151783198,7244.8017036914825,0.0,1,truck1,1.0,#nan,road(717),{9475.154452261657,7243.8599489526105,0.0},289.6516387813188,([road(13),road(27),road(168),road(170),road(171),road(456),road(161),road(677),road(678),road(680),road(681),road(540),road(496),road(498),road(189),road(188),road(173),road(118),road(216),road(215),road(213),road(317),road(316),road(292),road(351),road(659),road(662),road(606),road(605),road(585),road(729),road(730),road(700),road(286),road(647),road(648),road(371),road(90),road(91),road(621),road(716),road(717),road(325)]) as path,nil,12000,0,2323,46.34986070898285,3,1,2,5,1000,81754.85347904598,,541
+Phố Hàng Kênh,1045
+Phố Hàng Kênh,1048
+Phố Tràng Cát,1265
+Phố Cầu Đất,1500
+Phố Lê Chân,1508
+Phố Nguyễn Đức Cảnh,1515
+Phố Nguyễn Đức Cảnh,1516
+Phố Nguyễn Đức Cảnh,1519
+Phố Nguyễn Đức Cảnh,1526
+Phố Nguyễn Đức Cảnh,1529
+Phố Nguyễn Đức Cảnh,1530
+Phố Nguyễn Đức Cảnh,1535
+Phố Nguyễn Đức Cảnh,1536
+Phố Nguyễn Đức Cảnh,1540
+Phố Nguyễn Đức Cảnh,1541
+Phố Nguyễn Đức Cảnh,1544
+Phố Tràng Cát,1805
+Phố Nguyễn Đức Cảnh,2075
+Phố Tràng Cát,2345
+,nil,1
+2390truck2,9474.818151783198,7244.8017036914825,0.0,2,truck2,1.0,0.0,nil,{9475.154452261657,7243.8599489526105,0.0},289.6516387813188,nil,nil,12000,0,2246,44.773571010711734,2,0,2,5,1000,57101.933295057,,542
+Phố Hàng Kênh,1050
+Phố Hàng Kênh,1053
+Phố Hồ Sen,1083
+Phố Hồ Sen,1094
+Phố Hồ Sen,1095
+Phố Tràng Cát,1340
+Phố Chợ Con,1583
+Phố Hồ Sen,1587
+Phố Hồ Sen,1588
+Phố Hồ Sen,1589
+Phố Cát Cụt,2007
+Phố Tràng Cát,2269
+,nil,1
+2390truck3,9474.818151783198,7244.8017036914825,0.0,3,truck3,1.0,0.0,nil,{9475.154452261657,7243.8599489526105,0.0},289.6516387813188,nil,nil,9000,0,2177,50.203518904317015,4,1,3,5,1000,101254.29789511609,,538
+,540
+Phố Hàng Kênh,637
+Phố Hàng Kênh,638
+Phố Hàng Kênh,639
+Phố Tràng Cát,840
+Phố Hàng Kênh,1042
+Phố Hàng Kênh,1047
+Phố Tràng Cát,1250
+Phố Cầu Đất,1467
+Phố Cầu Đất,1468
+Phố Cầu Đất,1469
+Phố Cầu Đất,1470
+Phố Cầu Đất,1472
+Phố Cầu Đất,1473
+Phố Lê Chân,1477
+Phố Lê Chân,1478
+Phố Lê Chân,1479
+Phố Lê Chân,1480
+Phố Lê Chân,1482
+Phố Lê Chân,1483
+Phố Lê Chân,1484
+Phố Lê Chân,1485
+Phố Tràng Cát,1710
+Phố Nguyễn Đức Cảnh,1952
+Phố Nguyễn Đức Cảnh,1960
+Phố Tràng Cát,2209
+,nil,1
+2390truck4,9474.818151783198,7244.8017036914825,0.0,4,truck4,1.0,0.0,nil,{9475.154452261657,7243.8599489526105,0.0},289.6516387813188,nil,nil,9000,0,2256,48.931478723892226,3,1,2,5,1000,78507.77872046566,,539
+Phố Chợ Con,764
+Phố Chợ Con,767
+Phố Chợ Con,768
+Phố Chợ Con,769
+Phố Chợ Con,770
+Phố Chợ Con,777
+Phố Tràng Cát,999
+Phố Hàng Kênh,1206
+Phố Chợ Con,1223
+Phố Tràng Cát,1448
+Phố Hồ Sen,1673
+Phố Hồ Sen,1674
+Phố Hồ Sen,1675
+Phố Hồ Sen,1676
+Phố Hồ Sen,1677
+Phố Hai Bà Trưng (Cát Dài),1680
+Phố Hai Bà Trưng (Cát Dài),1684
+Phố Hai Bà Trưng (Cát Dài),1687
+Phố Lâm Tường,2020
+Phố Cát Cụt,2039
+Phố Tràng Cát,2279
+,nil,1
+2390truck5,9474.818151783198,7244.8017036914825,0.0,5,truck5,1.0,0.0,nil,{9475.154452261657,7243.8599489526105,0.0},289.6516387813188,nil,nil,4000,0,2249,53.647755672636954,4,1,3,5,1000,92624.81144245362,,534
+,536
+Phố Tràng Cát,744
+Phố Hàng Kênh,933
+Phố Tràng Cát,1125
+Phố Miếu Hai Xã,1325
+Phố Hồ Sen,1349
+Phố Hồ Sen,1351
+Phố Tràng Cát,1556
+Phố Hồ Sen,1762
+Phố Nguyễn Đức Cảnh,2030
+Phố Tràng Cát,2263
+,nil,1

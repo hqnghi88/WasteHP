@@ -36,7 +36,10 @@ global {
 		//clean data, with the given options
 		list<geometry> clean_lines <- clean_data ? clean_network(road_shapefile.contents,tolerance,split_lines,reduce_to_main_connected_components) : road_shapefile.contents;
 		//create road from the clean lines
-		create road from: clean_lines;
+		create road from: clean_lines  with: [rname::get("name"),beta::int(get("beta")), water::int(get("water"))]{
+			water<-(beta=9)?99:1;
+//			beta<-(beta=9)?99:beta;
+		}
 //		create road from: road_shapefile;
 		//build a network from the road agents
 		graph road_network_clean <- as_edge_graph(road);
@@ -45,12 +48,15 @@ global {
 		connected_components <- list<list<point>>(connected_components_of(road_network_clean));
 		loop times: length(connected_components) {colors << rnd_color(255);} 
 
-		save road to:"../includes/mapTP_clean.shp" crs:"3857" format:"shp"; 
+		save road to:"../includes/mapTP_clean.shp" crs:"3857" format:"shp"  attributes: ["rname"::rname,"beta":: int(beta),"water"::int(water)]; 
     }
 }
 
 //Species to represent the roads
 species road {
+	string rname;
+	int beta<-1;
+	int water<-1;
 	aspect default {
 		draw shape color: #black;
 	}
