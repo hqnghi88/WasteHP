@@ -32,8 +32,9 @@ global {
 			}
 
 		}
-
-		road_network <- as_edge_graph(road);
+ 		road_weights <- road as_map (each:: float(each.shape.perimeter)); 
+		road_network <- as_edge_graph(road) with_weights road_weights;
+		
 		road_network <- road_network with_shortest_path_algorithm #AStar;
 		create recyclebin from: csv_file("../includes/LE-CHAN 2.xlsx - Sheet1.csv", true) with:
 		[lat::float(get("lat")), lon::float(get("lon")), manual_cart::int(get("note")), address::string(get("addresss"))] {
@@ -82,6 +83,8 @@ global {
 			cnt <- 0;
 		}
 
+		road_weights <- road as_map (each::each.shape.perimeter  * ((jam )? each.beta : 1));
+		road_network <- road_network with_weights road_weights;
 	}
 
 	reflex pausing when: ((tocollect count (each.volume > 0)) = 0) and ((truck count (each.capacity > 0)) = 0) {
@@ -131,7 +134,7 @@ species truck skills: [moving] {
 			last_beta <- (jam )? road(old_path).beta : 1;
 		}
 
-		do goto on: road_network target: current_target speed: mySpeed / (last_beta * last_beta); //recompute_path: true move_weights: road_weights;
+		do goto on: road_network target: current_target speed: mySpeed / (last_beta) move_weights: road_weights; //recompute_path: true move_weights: road_weights;
 		if (old_path != current_edge and current_edge != nil) {
 		//			write current_edge;
 			total_distance <- total_distance + current_edge.perimeter;
