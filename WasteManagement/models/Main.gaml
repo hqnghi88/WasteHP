@@ -18,9 +18,13 @@ global {
 	list<recyclebin> tocollect <- [];
 	recyclebin source;
 	map<road, float> road_weights;
+	bool changeRoad <- false parameter: true;
 	bool block_flood <- false;
-	int rushhour_gap <- 100;
+	int rushhour_gap <- 200;
 	int rushhour_duration <- 400;
+	int cycle_end <- 0;
+	int cnt <- 0;
+	bool jam <- false;
 
 	init {
 		create road from: quanlechan3110_shape_file with: [rname::get("rname"), beta::int(get("beta")), water::int(get("water"))] {
@@ -32,9 +36,9 @@ global {
 			}
 
 		}
- 		road_weights <- road as_map (each:: float(each.shape.perimeter)); 
+
+		road_weights <- road as_map (each::float(each.shape.perimeter));
 		road_network <- as_edge_graph(road) with_weights road_weights;
-		
 		road_network <- road_network with_shortest_path_algorithm #AStar;
 		create recyclebin from: csv_file("../includes/LE-CHAN 2.xlsx - Sheet1.csv", true) with:
 		[lat::float(get("lat")), lon::float(get("lon")), manual_cart::int(get("note")), address::string(get("addresss"))] {
@@ -52,24 +56,24 @@ global {
 			location <- source.location;
 			max_capacity <- 12000;
 			mySpeed <- 40.0 + rnd(10.0);
+			roads_knowledge <- road_weights;
 		}
 
 		create truck number: 2 {
 			location <- source.location;
 			max_capacity <- 9000;
 			mySpeed <- 45.0 + rnd(10.0);
+			roads_knowledge <- road_weights;
 		}
 
 		create truck number: 1 {
 			location <- source.location;
 			max_capacity <- 4000;
 			mySpeed <- 45.0 + rnd(10.0);
+			roads_knowledge <- road_weights;
 		}
 
 	}
-
-	int cnt <- 0;
-	bool jam <- false;
 
 	reflex daytime {
 		cnt <- cnt + 1;
@@ -83,17 +87,25 @@ global {
 			cnt <- 0;
 		}
 
-		road_weights <- road as_map (each::each.shape.perimeter  * ((jam )? each.beta : 1));
+		road_weights <- road as_map (each::each.shape.perimeter * (jam ? each.beta : 1.0));
 		road_network <- road_network with_weights road_weights;
+		if (changeRoad) {
+			ask truck {
+				roads_knowledge <- road_weights;
+			}
+
+		}
+
 	}
 
-	reflex pausing when: ((tocollect count (each.volume > 0)) = 0) and ((truck count (each.capacity > 0)) = 0) {
+	reflex pausing when: (cycle_end = 0) and ((tocollect count (each.volume > 0)) = 0) and ((truck count (each.capacity > 0)) = 0) {
+		cycle_end <- cycle;
 		save truck to: "../result/output.csv" format: "csv";
 		ask truck {
 			save reststop to: "../result/truck" + int(self) + ".csv" format: "csv" header: false;
 		}
 
-		do pause;
+		//		do pause;
 	}
 
 }
@@ -111,6 +123,8 @@ species truck skills: [moving] {
 	int max_total_cycle <- 1000;
 	float total_distance <- 0.0;
 	string reststop <- "";
+	map<road, float> roads_knowledge;
+	path path_to_follow;
 
 	reflex choseTarget when: (current_target = nil) {
 		if (capacity < max_capacity) {
@@ -131,10 +145,22 @@ species truck skills: [moving] {
 
 	reflex goto when: current_target != nil {
 		if (old_path != nil) {
-			last_beta <- (jam )? road(old_path).beta : 1;
+			last_beta <- (jam) ? road(old_path).beta : 1;
 		}
 
-		do goto on: road_network target: current_target speed: mySpeed / (last_beta) move_weights: road_weights; //recompute_path: true move_weights: road_weights;
+		if (path_to_follow = nil) {
+
+		//Find the shortest path using the agent's own weights to compute the shortest path
+			path_to_follow <- path_between(road_network with_weights roads_knowledge, location, current_target);
+		}
+		//the agent follows the path it computed but with the real weights of the graph
+		do follow path: path_to_follow speed: mySpeed / (last_beta); //move_weights: road_weights;
+
+		//		if (changeRoad) {
+		//			do goto on: road_network target: current_target speed: mySpeed / last_beta move_weights: road_weights;
+		//		} else {
+		//			do goto on: road_network target: current_target speed: mySpeed / last_beta recompute_path:false;
+		//		}
 		if (old_path != current_edge and current_edge != nil) {
 		//			write current_edge;
 			total_distance <- total_distance + current_edge.perimeter;
@@ -142,6 +168,7 @@ species truck skills: [moving] {
 		}
 
 		if (location = current_target.location) {
+			path_to_follow <- nil;
 			if (old_path != nil) {
 				reststop <- reststop + ("" + road(old_path).rname + "," + cycle + "\n");
 				old_path <- nil;
@@ -237,31 +264,49 @@ species recyclebin {
 }
 
 experiment main type: gui {
-	float minimum_cycle_duration <- 0.001;
+//	float minimum_cycle_duration <- 0.01;
+	action _init_ {
+//		float sseed <- 1.0;
+		create simulation with: [changeRoad::false, seed::self.seed];
+		create simulation with: [changeRoad::true, seed::self.seed];
+	}
+
 	output synchronized: false {
-		layout horizontal([0::6190, 1::3810]) parameters: false navigator: false editors: false consoles: false toolbars: false tray: false tabs: false controls: true;
+		layout #split parameters: false navigator: false editors: false consoles: false toolbars: false tray: false tabs: false controls: true;
 		//		layout parameters: false navigator: false editors: false consoles: false toolbars: false tray: false tabs: false controls: true;
 		display main1 type: 3d axes: false background: #black {
-		//			camera 'default' location: {7173.9067, 4452.2435, 8396.4835} target: {7173.9067, 4452.0969, 0.0};
+			camera 'default' location: {5043.5324, 5134.4178, 12656.3535} target: {5043.5324, 5134.1969, 0.0};
+			overlay position: {50 #px, 50 #px} size: {1 #px, 1 #px} background: #black border: #black rounded: false {
+				float y <- 500 #px;
+				float x <- 10.0;
+				draw "Dynamic change road:" + changeRoad + " Ended:" + cycle_end at: {x, y} color: #white font: font("Arial", 15, #bold);
+				//							loop o over: truck {
+				//					draw "" + o + " came back " + o.count_comeback + " times, not full " + o.count_comeback_notfull + " times" at: {x, y} color: #white font: font("Arial", 15, #bold);
+				//					y <- y + 500;
+				//					draw "Distances:" + int(o.total_distance / 1000) + " km" + ", duration: " + o.total_cycle + " cycles" at: {x, y} color: #white font: font("Arial", 15, #bold);
+				//					y <- y + 500;
+				//				} 
+			}
+
 			image ("../includes/HP.png") position: {0, 0, -0.0001};
 			species road;
 			species truck;
 			species recyclebin position: {0, 0, 0.000001};
 		}
 
-		display main2 type: 3d axes: false background: #black {
-			graphics stats {
-				int y <- 0;
-				loop o over: truck {
-					draw "" + o + " came back " + o.count_comeback + " times, not full " + o.count_comeback_notfull + " times" at: {500, y} color: #white font: font("Arial", 15, #bold);
-					y <- y + 500;
-					draw "Distances:" + int(o.total_distance / 1000) + " km" + ", duration: " + o.total_cycle + " cycles" at: {1000, y} color: #white font: font("Arial", 15, #bold);
-					y <- y + 500;
-				}
-
-			}
-
-		}
+		//		display main2 type: 3d axes: false background: #black {
+		//			graphics stats {
+		//				int y <- 0;
+		//				loop o over: truck {
+		//					draw "" + o + " came back " + o.count_comeback + " times, not full " + o.count_comeback_notfull + " times" at: {500, y} color: #white font: font("Arial", 15, #bold);
+		//					y <- y + 500;
+		//					draw "Distances:" + int(o.total_distance / 1000) + " km" + ", duration: " + o.total_cycle + " cycles" at: {1000, y} color: #white font: font("Arial", 15, #bold);
+		//					y <- y + 500;
+		//				}
+		//
+		//			}
+		//
+		//		}
 
 	}
 
