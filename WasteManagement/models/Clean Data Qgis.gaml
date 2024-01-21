@@ -9,7 +9,7 @@ model clean_road_network
 
 global {
 	//Shapefile of the roads
-	file road_shapefile <- file("../includes/mapTP.shp"); 	
+	file road_shapefile <- file("../includes/mapHp.shp"); 	
 	//Shape of the environment
 	geometry shape <- envelope(road_shapefile);
 	
@@ -48,7 +48,7 @@ global {
 		connected_components <- list<list<point>>(connected_components_of(road_network_clean));
 		loop times: length(connected_components) {colors << rnd_color(255);} 
 
-		save road to:"../includes/mapTP_clean.shp" crs:"3857" format:"shp"  attributes: ["rname"::rname,"beta":: int(beta),"water"::int(water)]; 
+		save road to:"../includes/mapHp_clean.shp" crs:"3857" format:"shp"  attributes: ["rname"::rname,"beta":: int(beta),"water"::int(water)]; 
     }
 }
 
