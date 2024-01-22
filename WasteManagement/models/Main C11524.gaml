@@ -77,6 +77,13 @@ global {
 			mySpeed <- 40.0 + rnd(10.0);
 			wait_time <- 1;
 		}
+		create truck number: 2 {
+			is_backup<-true;
+			location <- source.location;
+			max_capacity <- 4000;
+			mySpeed <- 40.0 + rnd(10.0);
+			wait_time <- 1;
+		}
 	}
 
 	int cnt <- 0;
@@ -94,6 +101,14 @@ global {
 			cnt <- 0;
 		}
 
+	}
+	
+	reflex activate_backup{
+		if(flip(0.001)){
+			if(length(truck where each.is_backup)>0){
+				any(truck where each.is_backup).is_backup<-false;
+			}
+		}
 	}
 	
 	reflex pausing when: ((tocollect count (each.volume > 0)) = 0) and ((truck count (each.capacity > 0)) = 0) {
@@ -120,10 +135,11 @@ species truck skills: [moving] {
 	float total_distance <- 0.0;
 	string reststop <- "";
 	int manual_cart;
+	bool is_backup<-false;
 	
 	int wait_time <- 1;
 	
-	reflex choseTarget when: (current_target = nil) {
+	reflex choseTarget when: (current_target = nil) and !is_backup{
 		if (capacity < max_capacity) {
 			current_target <- (tocollect where (each.collector = nil and each.volume > 0)) closest_to self;
 			if (current_target = nil) {
@@ -140,7 +156,7 @@ species truck skills: [moving] {
 	geometry old_path <- nil;
 	int last_beta <- 1;
 	
-	reflex goto when: current_target != nil {
+	reflex goto when: current_target != nil  and !is_backup{
 		if (old_path != nil) {
 			last_beta <- (jam )? road(old_path).beta : 1;
 		}
@@ -203,7 +219,7 @@ species truck skills: [moving] {
 	
 	aspect default {
 	    float circleRadius <- max_capacity / 100;
-	    float textHeight <- 15;  // Độ cao của văn bản
+	    float textHeight <- 15.0;  // Độ cao của văn bản
 		
 	    float textX <- location.x - circleRadius / 2;  // Điều chỉnh vị trí X sao cho nằm giữa hình tròn
 	    float textY <- location.y + circleRadius / 2 + textHeight / 2;  // Điều chỉnh vị trí Y sao cho nằm trên cùng
@@ -221,7 +237,7 @@ species truck skills: [moving] {
 		    ) perspective: true;
 		
 		}
-		draw circle(circleRadius) color: #green;
+		draw circle(circleRadius) color: is_backup?#darkgray:#green;
      // draw "" + int(capacity / max_capacity * 100) + "%" color: #red font: font("Arial", 18, #bold) perspective: true;
 	 //	draw "" + count_comeback + "" color: #red font: font("Arial", 18, #bold) perspective: true;
 		
