@@ -45,27 +45,36 @@ global {
 			}
 
 		}
-
+		create thungrac from: csv_file("../includes/thungrac.csv", true) with:
+		[lat::float(get("lat")), lon::float(get("lon")),address::string(get("Địa điểm thùng/ điểm tập kết"))]{
+			location <- to_GAMA_CRS({lon, lat}, "EPSG:4326").location;
+			volume <- 250;
+			if (not (location overlaps world.shape)) {
+				do die;
+			}
+		}
+			
+		
 		source <- first(recyclebin where (each.name = "recyclebin0"));
 		tocollect <- recyclebin where (each.name != "recyclebin0");
-		create truck number: 20 {
+		create truck number: 4 {
 			location <- source.location;
 			max_capacity <- 12000;
 			mySpeed <- 40.0 + rnd(10.0);
 			wait_time <- 1;
 		}
 
-		create truck number: 14 {
+		create truck number: 3 {
 			location <- source.location;
 			max_capacity <- 9000;
 			mySpeed <- 45.0 + rnd(10.0);
 			wait_time <- 1;
 		}
 
-		create truck number: 4 {
+		create truck number: 2 {
 			location <- source.location;
 			max_capacity <- 4000;
-			mySpeed <- 45.0 + rnd(10.0);
+			mySpeed <- 40.0 + rnd(10.0);
 			wait_time <- 1;
 		}
 	}
@@ -264,6 +273,26 @@ species recyclebin {
 
 }
 
+species thungrac{
+	truck collector;
+	string address;
+	float lat;
+	float lon;
+	int manual_cart;
+	int volume <- 0;
+
+	reflex pollute {
+	}
+	
+	aspect default {
+		if (volume > 0) {
+		//				draw triangle(150) color: #blue;
+				//	draw "" + volume color: #yellow font: font("Arial", 15, #bold);
+			draw square(150) color: #blue;
+		}
+	}
+}
+
 experiment main type: gui {
 	float minimum_cycle_duration <- 0.001;
 	output synchronized: false {
@@ -275,6 +304,7 @@ experiment main type: gui {
 			species road;
 			species truck;
 			species recyclebin position: {0, 0, 0.000001};
+			species thungrac position: {0, 0, 0.0001};
 		}
 
 		display main2 type: 3d axes: false background: #black {
