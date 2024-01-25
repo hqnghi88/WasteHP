@@ -21,6 +21,8 @@ global {
 	int rushhour_gap <- 100;
 	int rushhour_duration <- 400;
 	float current_step <- time;
+	
+	string map_center <- "48.8566140,2.3522219";
 		
 	init {
 		create road from: quanlechan3110_shape_file with: [rname::get("rname"), beta::int(get("beta")), water::int(get("water"))] {
@@ -84,6 +86,12 @@ global {
 			mySpeed <- 40.0 + rnd(10.0);
 			wait_time <- 1;
 		}
+		
+		create api_loader;
+		ask api_loader {
+			do run_thread interval: 60 #second;
+		}
+		
 	}
 
 	int cnt <- 0;
@@ -121,6 +129,101 @@ global {
 
 }
 
+
+species api_loader skills: [thread] {
+	float start <- machine_time;
+	float end <- machine_time;
+
+	//counting down
+	action thread_action {
+		try {
+			do loadtraffic;
+		}
+
+		catch {
+			write ".";
+		}
+
+	}
+
+	action loadtraffic {
+		geometry loc <- (world.shape CRS_transform ("EPSG:4326"));
+		map_center <- "" + loc.points[0].y + "," + loc.points[0].x + "," + loc.points[2].y + "," + loc.points[2].x;
+		//		write map_center;
+		ask traffic_incident {
+			do recover;
+			do die;
+		}
+
+		//				write "https://dev.virtualearth.net/REST/v1/Traffic/Incidents/" + map_center + "?includeJamcidents=true&key=AvZ5t7w-HChgI2LOFoy_UF4cf77ypi2ctGYxCgWOLGFwMGIGrsiDpCDCjliUliln";
+		json_file
+		sss <- json_file("https://dev.virtualearth.net/REST/v1/Traffic/Incidents/" + map_center + "?includeJamcidents=true&key=AvZ5t7w-HChgI2LOFoy_UF4cf77ypi2ctGYxCgWOLGFwMGIGrsiDpCDCjliUliln");
+		map<string, unknown> c <- sss.contents;
+		list cells <- c["resourceSets"]["resources"];
+		loop mm over: cells {
+			loop mmm over: mm as list {
+				map<string, unknown> cc <- mmm;
+				traffic_incident tt;
+				if (cc["point"] != nil) {
+					point pp <- cc["point"]["coordinates"];
+					geometry pcc <- square(100) at_location (to_GAMA_CRS({pp.y, pp.x}, "4326").location);
+					//					write (building  overlapping pcc);
+					if (length(road overlapping pcc)>0) {
+						create traffic_incident {
+							description <- cc["description"];
+							tt <- self;
+							//					location<-(pp   CRS_transform("EPSG:32648")).location;
+							location <- to_GAMA_CRS({pp.y, pp.x}, "4326").location;
+							do cause_slowdown;
+						}
+
+					}
+ 
+				}
+
+//				if (cc["toPoint"] != nil and tt != nil) {
+//					point pp <- cc["toPoint"]["coordinates"];
+//					point ppp <- to_GAMA_CRS({pp.y, pp.x}, "4326").location;
+//					tt.shape <- line([tt.location, ppp]);
+//				}
+
+			}
+
+		}
+
+
+
+	}
+
+
+}
+
+species traffic_incident {
+	geometry shape <- circle(30);
+	string description;
+
+
+	action recover{
+			list<road> tmp<-road at_distance 1;
+			ask tmp{
+				incident_beta<-0;
+			} 
+
+	}
+	action cause_slowdown{
+			list<road> tmp<-road at_distance 1;
+			ask tmp{
+				incident_beta<-4;
+			} 
+
+	}
+
+	aspect default {
+	//		draw description color: #pink at: location perspective: false font: font("SansSerif", 36, #bold);
+		draw triangle(350) color: #red;
+	}
+
+}
 species truck skills: [moving] {
 	recyclebin current_target;
 	int max_capacity <- 12000;
@@ -158,7 +261,7 @@ species truck skills: [moving] {
 	
 	reflex goto when: current_target != nil  and !is_backup{
 		if (old_path != nil) {
-			last_beta <- (jam )? road(old_path).beta : 1;
+			last_beta <- (jam )? (road(old_path).beta+road(old_path).incident_beta) : 1;
 		}
 
 		if wait_time = 0 {
@@ -246,6 +349,7 @@ species truck skills: [moving] {
 
 species road {
 	int beta <- 1;
+	int incident_beta<-0;
 	int water <- 1;
 	string rname;
 
@@ -318,6 +422,7 @@ experiment main type: gui {
 		//			camera 'default' location: {7173.9067, 4452.2435, 8396.4835} target: {7173.9067, 4452.0969, 0.0};
 			image ("../includes/background2.png") position: 	{0, 0, -0.0001};
 			species road;
+			species traffic_incident ;
 			species truck;
 			species recyclebin position: {0, 0, 0.000001};
 			species thungrac position: {0, 0, 0.0001};

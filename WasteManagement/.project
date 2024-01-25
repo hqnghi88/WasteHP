@@ -15,4 +15,11 @@
 		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
 		<nature>msi.gama.application.gamaNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>external/20.770241099909228,106.5474244998815,20.935060299880448,106.8471194999297-4886769159093063852</name>
+			<type>1</type>
+			<locationURI>CACHE_LOC/dev.virtualearth.net+_++_+REST+_+v1+_+Traffic+_+Incidents+_+20.770241099909228,106.5474244998815,20.935060299880448,106.8471194999297-4886769159093063852</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>
